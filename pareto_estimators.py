@@ -1,4 +1,5 @@
 from scipy.stats import pareto
+from scipy.stats import hmean
 from functools import wraps
 from timeit import default_timer as time
 import numpy as np
@@ -10,7 +11,6 @@ def measure_time(f):
     :param f: function whose time is measured
     :return: the results of function f and total time of its execution
     """
-
     @wraps(f)
     def wrapper(*args, **kwargs):
         start = time()
@@ -24,7 +24,7 @@ def measure_time(f):
             results_dict[f.__name__].append([result, duration])
         return result, duration
     return wrapper
-# poznámka
+
 
 @measure_time
 def dummy_estimator(data_series):
@@ -91,6 +91,7 @@ def maximum_likelihood_estimator_scipy(data_series):
     params = pareto.fit(data_series)
     return params[0], params[2]
 
+
 @measure_time
 def mom_estimator(data_series):
     t = np.mean(data_series)
@@ -101,6 +102,7 @@ def mom_estimator(data_series):
     gamma = np.sqrt(s2 + t ** 2) / (s + np.sqrt(s2 + t ** 2)) * t
 
     return alpha, gamma
+
 
 @measure_time
 def mm1_estimator(data_series):
@@ -113,6 +115,7 @@ def mm1_estimator(data_series):
 
     return alpha, gamma
 
+
 @measure_time
 def mm2_estimator(data_series):
     hm = hmean(data_series)
@@ -122,6 +125,7 @@ def mm2_estimator(data_series):
     gamma = np.sqrt(t + hm) * hm / (np.sqrt(t) + np.sqrt(t + hm))
 
     return alpha, gamma
+
 
 @measure_time
 def mm3_estimator(data_series):
@@ -134,6 +138,7 @@ def mm3_estimator(data_series):
 
     return alpha, gamma
 
+
 @measure_time
 def mm4_estimator(data_series):
     t1 = min(data_series)
@@ -142,8 +147,8 @@ def mm4_estimator(data_series):
 
     alpha = ((n - 1) * t) / (n * (t - t1))
     gamma = t1 * (n / (n + 1)) ** (1 / alpha)
-
     return alpha, gamma
+
 
 results_dict = {}
 pareto_shape = 2
