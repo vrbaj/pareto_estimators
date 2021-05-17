@@ -10,6 +10,7 @@ def measure_time(f):
     :param f: function whose time is measured
     :return: the results of function f and total time of its execution
     """
+
     @wraps(f)
     def wrapper(*args, **kwargs):
         start = time()
@@ -17,8 +18,12 @@ def measure_time(f):
         end = time()
         duration = end - start
         print('Elapsed time: {} seconds'.format(duration) + ' for function ' + f.__name__)
-        results_dict[f.__name__] = [result, duration]
+        if not f.__name__ in results_dict.keys():
+            results_dict[f.__name__] = [[result, duration]]
+        else:
+            results_dict[f.__name__].append([result, duration])
         return result, duration
+
     return wrapper
 
 
@@ -96,6 +101,6 @@ dummy_estimator(pareto_data)
 umvue_estimator(pareto_data)
 maximum_likelihood_estimator(pareto_data)
 maximum_likelihood_estimator_scipy(pareto_data)
+maximum_likelihood_estimator_scipy(pareto_data)
 
 print(results_dict)
-
