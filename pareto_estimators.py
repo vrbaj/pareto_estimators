@@ -107,11 +107,12 @@ def mom_estimator(data_series):
 @measure_time
 def mm1_estimator(data_series):
     s2 = np.var(data_series)
-    s = np.corrcoef(data_series)
+    # s = np.corrcoef(data_series)
+    s = np.sqrt(s2)
     t2 = np.mean(data_series) ** 2
 
     alpha = 1 + np.sqrt(1 + t2 / s2)
-    gamma = np.sqrt(s2 + t2) * np.sqrt((s + np.sqrt(s2 + t2) - 2 * s) / (s + np.sqrt(s2 + t2)))
+    gamma = np.sqrt((s2 + t2) * (np.sqrt(s2 + t2) - s) / (s + np.sqrt(s2 + t2)))
 
     return alpha, gamma
 
@@ -152,12 +153,20 @@ def mm4_estimator(data_series):
 
 results_dict = {}
 pareto_shape = 2
-pareto_scale = 5
+pareto_scale = 1
+
 pareto_data = get_pareto_data(pareto_shape, pareto_scale, 100)
+
 dummy_estimator(pareto_data)
 umvue_estimator(pareto_data)
 maximum_likelihood_estimator(pareto_data)
 maximum_likelihood_estimator_scipy(pareto_data)
-maximum_likelihood_estimator_scipy(pareto_data)
+mm1_estimator(pareto_data)
+mm2_estimator(pareto_data)
+mm3_estimator(pareto_data)
+mm4_estimator(pareto_data)
 
-print(results_dict)
+results_dict["pareto"] = [(pareto_shape, pareto_scale)]
+
+for key in results_dict.keys():
+    print("{} params: {}".format(key, results_dict[key][0]))
