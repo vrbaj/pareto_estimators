@@ -96,8 +96,8 @@ def maximum_likelihood_estimator_scipy(data_series):
 def mom_estimator(data_series):
     t = np.mean(data_series)
     s2 = np.var(data_series)
-    s = np.corrcoef(data_series)
-
+    # s = np.corrcoef(data_series)
+    s = np.sqrt(s2)
     alpha = 1 + np.sqrt(1 + (t ** 2) / s2)
     gamma = np.sqrt(s2 + t ** 2) / (s + np.sqrt(s2 + t ** 2)) * t
 
@@ -161,6 +161,7 @@ dummy_estimator(pareto_data)
 umvue_estimator(pareto_data)
 maximum_likelihood_estimator(pareto_data)
 maximum_likelihood_estimator_scipy(pareto_data)
+mom_estimator(pareto_data)
 mm1_estimator(pareto_data)
 mm2_estimator(pareto_data)
 mm3_estimator(pareto_data)
