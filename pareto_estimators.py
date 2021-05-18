@@ -152,10 +152,10 @@ def mm4_estimator(data_series):
 
 
 results_dict = {}
-pareto_shape = 2
-pareto_location = 3
+pareto_shape = 30
+pareto_location = 1
 
-pareto_data = get_pareto_data(pareto_shape, pareto_location, 100)
+pareto_data = get_pareto_data(pareto_shape, pareto_location, 1000)
 
 dummy_estimator(pareto_data)
 umvue_estimator(pareto_data)
