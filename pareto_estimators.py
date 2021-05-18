@@ -31,20 +31,20 @@ def dummy_estimator(data_series):
     """
     dummy function to illustrate how to work with @measure_time decorator
     :param data_series: samples from pareto distribution that are used to estimate its parameters
-    :return: it should return the shape and scale parameters, now it returns dummy tuple
+    :return: it should return the shape and location parameters, now it returns dummy tuple
     """
     return min(data_series), max(data_series)
 
 
-def get_pareto_data(shape, scale, number_of_data):
+def get_pareto_data(shape, location, number_of_data):
     """
-    function to generate data from Pareto distribution specified by shape (alpha) and scale (gamma) parameters
+    function to generate data from Pareto distribution specified by shape (alpha) and location (gamma) parameters
     :param shape: alpha parameter of pareto distribution
-    :param scale: gamma parameter of pareto distribution
+    :param location: gamma parameter of pareto distribution
     :param number_of_data: number of data samples to generate
-    :return: numpy.ndarray with samples from pareto distribution specified by :param shape and :param scale.
+    :return: numpy.ndarray with samples from pareto distribution specified by :param shape and :param location.
     """
-    data = pareto.rvs(shape, scale=scale, size=number_of_data)
+    data = pareto.rvs(shape, scale=location, size=number_of_data)
     return data
 
 
@@ -52,7 +52,7 @@ def get_pareto_data(shape, scale, number_of_data):
 def umvue_estimator(data_series):
     """
     function that implements uniformly minimum variance unbiased estimators for Pareto distribution
-    (ESTIMATION OF THE SHAPE AND SCALE PARAMETERS OF THE PARETO DISTRIBUTION USING EXTREME RANKED SET SAMPLING)
+    (ESTIMATION OF THE SHAPE AND location PARAMETERS OF THE PARETO DISTRIBUTION USING EXTREME RANKED SET SAMPLING)
     :param data_series: samples from pareto distribution that are used to estimate its parameters
     :return: tuple (alpha, gamma) that contains estimated parameters of Pareto distribution
     """
@@ -69,7 +69,7 @@ def umvue_estimator(data_series):
 def maximum_likelihood_estimator(data_series):
     """
     function that implements the maximum likelihood estimator as closed solution
-    (ESTIMATION OF THE SHAPE AND SCALE PARAMETERS OF THE PARETO DISTRIBUTION USING EXTREME RANKED SET SAMPLING)
+    (ESTIMATION OF THE SHAPE AND location PARAMETERS OF THE PARETO DISTRIBUTION USING EXTREME RANKED SET SAMPLING)
     :param data_series: samples from pareto distribution that are used to estimate its parameters
     :return: tuple (alpha, gamma) that contains estimated parameters of Pareto distribution
     """
@@ -153,9 +153,9 @@ def mm4_estimator(data_series):
 
 results_dict = {}
 pareto_shape = 2
-pareto_scale = 1
+pareto_location = 3
 
-pareto_data = get_pareto_data(pareto_shape, pareto_scale, 100)
+pareto_data = get_pareto_data(pareto_shape, pareto_location, 100)
 
 dummy_estimator(pareto_data)
 umvue_estimator(pareto_data)
@@ -166,7 +166,7 @@ mm2_estimator(pareto_data)
 mm3_estimator(pareto_data)
 mm4_estimator(pareto_data)
 
-results_dict["pareto"] = [(pareto_shape, pareto_scale)]
+results_dict["pareto"] = [(pareto_shape, pareto_location)]
 
 for key in results_dict.keys():
     print("{} params: {}".format(key, results_dict[key][0]))
