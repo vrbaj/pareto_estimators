@@ -94,6 +94,12 @@ def maximum_likelihood_estimator_scipy(data_series):
 
 @measure_time
 def mom_estimator(data_series):
+    """
+    function that implements the Method of Moments estimator
+    (Parameter estimation of Pareto distribution: some modified moment estimators)
+    :param data_series: samples from pareto distribution that are used to estimate its parameters
+    :return: tuple (alpha, gamma) that contains estimated parameters of Pareto distribution
+    """
     t = np.mean(data_series)
     s2 = np.var(data_series)
     s = np.sqrt(s2)
@@ -104,6 +110,12 @@ def mom_estimator(data_series):
 
 @measure_time
 def mm1_estimator(data_series):
+    """
+    function that implements the first modification of Method of Moments estimator
+    (Parameter estimation of Pareto distribution: some modified moment estimators)
+    :param data_series: samples from pareto distribution that are used to estimate its parameters
+    :return: tuple (alpha, gamma) that contains estimated parameters of Pareto distribution
+    """
     s2 = np.var(data_series)
     s = np.sqrt(s2)
     t2 = np.mean(data_series) ** 2
@@ -114,6 +126,12 @@ def mm1_estimator(data_series):
 
 @measure_time
 def mm2_estimator(data_series):
+    """
+    function that implements the second modification of Method of Moments estimator
+    (Parameter estimation of Pareto distribution: some modified moment estimators)
+    :param data_series: samples from pareto distribution that are used to estimate its parameters
+    :return: tuple (alpha, gamma) that contains estimated parameters of Pareto distribution
+    """
     hm = hmean(data_series)
     t = np.mean(data_series)
 
@@ -125,6 +143,12 @@ def mm2_estimator(data_series):
 
 @measure_time
 def mm3_estimator(data_series):
+    """
+    function that implements the third modification of Method of Moments estimator
+    (Parameter estimation of Pareto distribution: some modified moment estimators)
+    :param data_series: samples from pareto distribution that are used to estimate its parameters
+    :return: tuple (alpha, gamma) that contains estimated parameters of Pareto distribution
+    """
     t1 = min(data_series)
     n = len(data_series)
     t = np.mean(data_series)
@@ -137,6 +161,12 @@ def mm3_estimator(data_series):
 
 @measure_time
 def mm4_estimator(data_series):
+    """
+    function that implements the fourth modification of Method of Moments estimator
+    (Parameter estimation of Pareto distribution: some modified moment estimators)
+    :param data_series: samples from pareto distribution that are used to estimate its parameters
+    :return: tuple (alpha, gamma) that contains estimated parameters of Pareto distribution
+    """
     t1 = min(data_series)
     n = len(data_series)
     t = np.mean(data_series)
