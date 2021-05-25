@@ -3,6 +3,7 @@ from scipy.stats import hmean
 from functools import wraps
 from timeit import default_timer as time
 import numpy as np
+from matplotlib import pyplot as plt
 
 
 def measure_time(f):
@@ -18,7 +19,7 @@ def measure_time(f):
         end = time()
         duration = end - start
         print('Elapsed time: {} seconds'.format(duration) + ' for function ' + f.__name__)
-        if not f.__name__ in results_dict.keys():
+        if f.__name__ not in results_dict.keys():
             results_dict[f.__name__] = [[result, duration]]
         else:
             results_dict[f.__name__].append([result, duration])
@@ -66,7 +67,7 @@ def umvue_estimator(data_series):
 
 
 @measure_time
-def maximum_likelihood_estimator(data_series):
+def ml_estimator(data_series):
     """
     function that implements the maximum likelihood estimator as closed solution
     (ESTIMATION OF THE SHAPE AND location PARAMETERS OF THE PARETO DISTRIBUTION USING EXTREME RANKED SET SAMPLING)
@@ -87,7 +88,6 @@ def maximum_likelihood_estimator_scipy(data_series):
     :param data_series: samples from pareto distribution that are used to estimate its parameters
     :return: tuple (alpha, gamma) that contains estimated parameters of Pareto distribution
     """
-    params = [0, 0, 0]
     params = pareto.fit(data_series)
     return params[0], params[2]
 
@@ -96,24 +96,19 @@ def maximum_likelihood_estimator_scipy(data_series):
 def mom_estimator(data_series):
     t = np.mean(data_series)
     s2 = np.var(data_series)
-    # s = np.corrcoef(data_series)
     s = np.sqrt(s2)
     alpha = 1 + np.sqrt(1 + (t ** 2) / s2)
     gamma = np.sqrt(s2 + t ** 2) / (s + np.sqrt(s2 + t ** 2)) * t
-
     return alpha, gamma
 
 
 @measure_time
 def mm1_estimator(data_series):
     s2 = np.var(data_series)
-    # s = np.corrcoef(data_series)
     s = np.sqrt(s2)
     t2 = np.mean(data_series) ** 2
-
     alpha = 1 + np.sqrt(1 + t2 / s2)
     gamma = np.sqrt((s2 + t2) * (np.sqrt(s2 + t2) - s) / (s + np.sqrt(s2 + t2)))
-
     return alpha, gamma
 
 
@@ -151,15 +146,38 @@ def mm4_estimator(data_series):
     return alpha, gamma
 
 
+def plot_graph(results_dictionary, file_name):
+    """
+    function to create and save a graph for an article with computational times for each method that is in
+    results_dictionary
+    :param file_name: name of file with eps extension where the plot is saved (i.e. computational_times.eps)
+    :param results_dictionary: dictionary where the key is the method name and
+    value is list with structure [(alpha_parameter, gamma_parameter), computational_time)
+    :return: None
+    """
+    methods_name = []
+    computational_times = []
+    for k in results_dict.keys():
+        if "scipy" not in k:
+            methods_name.append(k.replace("_estimator", ""))
+            print(results_dictionary[k][0][1])
+            computational_times.append(results_dictionary[k][0][1])
+    plt.bar(methods_name, computational_times)
+    plt.xlabel("Estimation method")
+    plt.ylabel("Computational time [$s$]")
+    plt.tight_layout(True)
+    plt.savefig(file_name, format="eps", dpi=600)
+
+
 results_dict = {}
 pareto_shape = 30
 pareto_location = 1
 
 pareto_data = get_pareto_data(pareto_shape, pareto_location, 1000)
 
-dummy_estimator(pareto_data)
+# dummy_estimator(pareto_data)
 umvue_estimator(pareto_data)
-maximum_likelihood_estimator(pareto_data)
+ml_estimator(pareto_data)
 maximum_likelihood_estimator_scipy(pareto_data)
 mom_estimator(pareto_data)
 mm1_estimator(pareto_data)
@@ -167,7 +185,9 @@ mm2_estimator(pareto_data)
 mm3_estimator(pareto_data)
 mm4_estimator(pareto_data)
 
-results_dict["pareto"] = [(pareto_shape, pareto_location)]
+# TODO make multiple computations for each method and estimate the average the time parameter estimation
 
 for key in results_dict.keys():
     print("{} params: {}".format(key, results_dict[key][0]))
+plot_graph(results_dict, "ct_results.eps")
+plt.show()
