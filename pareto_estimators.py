@@ -12,6 +12,7 @@ def measure_time(f):
     :param f: function whose time is measured
     :return: the results of function f and total time of its execution
     """
+
     @wraps(f)
     def wrapper(*args, **kwargs):
         start = time()
@@ -24,6 +25,7 @@ def measure_time(f):
         else:
             results_dict[f.__name__].append([result, duration])
         return result, duration
+
     return wrapper
 
 
@@ -184,7 +186,7 @@ def graph_plotter(results_dictionary, file_name):
     [average computational time, std dev]
     :return: None
     """
-    computational_times = [value[1] for key, value in results_dictionary.items()]
+    computational_times = [value[0] for key, value in results_dictionary.items()]
     plt.bar(results_dictionary.keys(), computational_times)
     plt.xlabel("Estimation method")
     plt.ylabel("Computational time [$s$]")
@@ -207,8 +209,8 @@ def table_maker(results_dictionary, file_name):
         f.writelines(r"\hline" + "\n")
         f.writelines(r"Method & $\overline{CT}$ & $\sigma_{CT}$" + "\n")
         for key in results_dictionary.keys():
-            f.writelines(key + (r" & {:.2e} &  {:.2e} \\ \hline" .format(results_dictionary[key][0],
-                                                                       results_dictionary[key][1])) + "\n")
+            f.writelines(key + (r" & {:.2e} &  {:.2e} \\ \hline".format(results_dictionary[key][0],
+                                                                        results_dictionary[key][1])) + "\n")
         f.writelines(r"\end{tabular}" + "\n")
         f.writelines(r"\end{table}" + "\n")
 
@@ -218,22 +220,17 @@ def table_maker(results_dictionary, file_name):
 results_dict = {}
 pareto_shape = 4
 pareto_location = 1
-experiments_number = 1000000
+experiments_number = 10000
+data_quantity = [100]  # TODO generalize to get results for various pareto_data lengths
+function_names = ["umvue_estimator", "ml_estimator", "mom_estimator", "mm1_estimator", "mm2_estimator", "mm3_estimator",
+                  "mm4_estimator"]
 
 for experiment in range(experiments_number):
-    pareto_data = get_pareto_data(pareto_shape, pareto_location, 1000)
-
-    # dummy_estimator(pareto_data)
-    umvue_estimator(pareto_data)
-    ml_estimator(pareto_data)
-    maximum_likelihood_estimator_scipy(pareto_data)
-    mom_estimator(pareto_data)
-    mm1_estimator(pareto_data)
-    mm2_estimator(pareto_data)
-    mm3_estimator(pareto_data)
-    mm4_estimator(pareto_data)
+    for function_name in function_names:
+        pareto_data = get_pareto_data(pareto_shape, pareto_location, data_quantity[0])
+        eval(function_name + "(pareto_data)")
     if experiment % 100 == 99:
-        print("Evaluated {:.2%} experiments".format((experiment + 1)/experiments_number))
+        print("Evaluated {:.2%} experiments".format((experiment + 1) / experiments_number))
 
 avg_results = {}
 for k in results_dict.keys():
@@ -242,7 +239,6 @@ for k in results_dict.keys():
         for result in results_dict[k]:
             total_time.append(result[1])
         avg_results[k.replace("_estimator", "")] = [np.average(total_time), np.std(total_time)]
-
 
 graph_plotter(avg_results, "ct_results.eps")
 table_maker(avg_results, "ct_table.txt")
