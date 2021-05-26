@@ -18,7 +18,7 @@ def measure_time(f):
         result = f(*args, **kwargs)
         end = time()
         duration = end - start
-        print('Elapsed time: {} seconds'.format(duration) + ' for function ' + f.__name__)
+        # print('Elapsed time: {} seconds'.format(duration) + ' for function ' + f.__name__)
         if f.__name__ not in results_dict.keys():
             results_dict[f.__name__] = [[result, duration]]
         else:
@@ -170,54 +170,80 @@ def mm4_estimator(data_series):
     t1 = min(data_series)
     n = len(data_series)
     t = np.mean(data_series)
-
     alpha = ((n - 1) * t) / (n * (t - t1))
     gamma = t1 * (n / (n + 1)) ** (1 / alpha)
     return alpha, gamma
 
 
-def plot_graph(results_dictionary, file_name):
+def graph_plotter(results_dictionary, file_name):
     """
-    function to create and save a graph for an article with computational times for each method that is in
-    results_dictionary
+    function to create and save a graph and table for an article with average computational times for each method
+    that are  in results_dictionary
     :param file_name: name of file with eps extension where the plot is saved (i.e. computational_times.eps)
-    :param results_dictionary: dictionary where the key is the method name and
-    value is list with structure [(alpha_parameter, gamma_parameter), computational_time)
+    :param results_dictionary: dictionary where the key is the method name and value is a list
+    [average computational time, std dev]
     :return: None
     """
-    methods_name = []
-    computational_times = []
-    for k in results_dict.keys():
-        if "scipy" not in k:
-            methods_name.append(k.replace("_estimator", ""))
-            print(results_dictionary[k][0][1])
-            computational_times.append(results_dictionary[k][0][1])
-    plt.bar(methods_name, computational_times)
+    computational_times = [value[1] for key, value in results_dictionary.items()]
+    plt.bar(results_dictionary.keys(), computational_times)
     plt.xlabel("Estimation method")
     plt.ylabel("Computational time [$s$]")
     plt.tight_layout(True)
     plt.savefig(file_name, format="eps", dpi=600)
 
 
+def table_maker(results_dictionary, file_name):
+    """
+    function to create tex table with average computational times for each method that is in results_dictionary
+    :param results_dictionary: dictionary where the key is the method name and value is a list
+    [average computational time, std dev]
+    :param file_name: name of plain text with with latex table
+    :return: None
+    """
+    with open(file_name, "w") as f:
+        f.writelines(r"\begin{table}[]" + "\n")
+        f.writelines(r"\centering" + "\n")
+        f.writelines(r"\begin{tabular}{|c|c|c|}" + "\n")
+        f.writelines(r"\hline" + "\n")
+        f.writelines(r"Method & $\overline{CT}$ & $\sigma_{CT}$" + "\n")
+        for key in results_dictionary.keys():
+            f.writelines(key + (r" & {:.2e} &  {:.2e} \\ \hline" .format(results_dictionary[key][0],
+                                                                       results_dictionary[key][1])) + "\n")
+        f.writelines(r"\end{tabular}" + "\n")
+        f.writelines(r"\end{table}" + "\n")
+
+    f.close()
+
+
 results_dict = {}
-pareto_shape = 30
+pareto_shape = 4
 pareto_location = 1
+experiments_number = 1000000
 
-pareto_data = get_pareto_data(pareto_shape, pareto_location, 1000)
+for experiment in range(experiments_number):
+    pareto_data = get_pareto_data(pareto_shape, pareto_location, 1000)
 
-# dummy_estimator(pareto_data)
-umvue_estimator(pareto_data)
-ml_estimator(pareto_data)
-maximum_likelihood_estimator_scipy(pareto_data)
-mom_estimator(pareto_data)
-mm1_estimator(pareto_data)
-mm2_estimator(pareto_data)
-mm3_estimator(pareto_data)
-mm4_estimator(pareto_data)
+    # dummy_estimator(pareto_data)
+    umvue_estimator(pareto_data)
+    ml_estimator(pareto_data)
+    maximum_likelihood_estimator_scipy(pareto_data)
+    mom_estimator(pareto_data)
+    mm1_estimator(pareto_data)
+    mm2_estimator(pareto_data)
+    mm3_estimator(pareto_data)
+    mm4_estimator(pareto_data)
+    if experiment % 100 == 99:
+        print("Evaluated {:.2%} experiments".format((experiment + 1)/experiments_number))
 
-# TODO make multiple computations for each method and estimate the average the time parameter estimation
+avg_results = {}
+for k in results_dict.keys():
+    if "scipy" not in k:
+        total_time = []
+        for result in results_dict[k]:
+            total_time.append(result[1])
+        avg_results[k.replace("_estimator", "")] = [np.average(total_time), np.std(total_time)]
 
-for key in results_dict.keys():
-    print("{} params: {}".format(key, results_dict[key][0]))
-plot_graph(results_dict, "ct_results.eps")
+
+graph_plotter(avg_results, "ct_results.eps")
+table_maker(avg_results, "ct_table.txt")
 plt.show()
