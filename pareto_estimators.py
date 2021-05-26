@@ -220,14 +220,14 @@ def table_maker(results_dictionary, file_name):
 results_dict = {}
 pareto_shape = 4
 pareto_location = 1
-experiments_number = 10000
-data_quantity = [100]  # TODO generalize to get results for various pareto_data lengths
+experiments_number = 100
+data_quantity = 100
 function_names = ["umvue_estimator", "ml_estimator", "mom_estimator", "mm1_estimator", "mm2_estimator", "mm3_estimator",
                   "mm4_estimator"]
 
 for experiment in range(experiments_number):
     for function_name in function_names:
-        pareto_data = get_pareto_data(pareto_shape, pareto_location, data_quantity[0])
+        pareto_data = get_pareto_data(pareto_shape, pareto_location, data_quantity)
         eval(function_name + "(pareto_data)")
     if experiment % 100 == 99:
         print("Evaluated {:.2%} experiments".format((experiment + 1) / experiments_number))
@@ -240,6 +240,6 @@ for k in results_dict.keys():
             total_time.append(result[1])
         avg_results[k.replace("_estimator", "")] = [np.average(total_time), np.std(total_time)]
 
-graph_plotter(avg_results, "ct_results.eps")
-table_maker(avg_results, "ct_table.txt")
+graph_plotter(avg_results, "ct_results_{}.eps".format(data_quantity))
+table_maker(avg_results, "ct_table_{}.txt".format(data_quantity))
 plt.show()
