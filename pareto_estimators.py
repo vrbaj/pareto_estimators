@@ -13,6 +13,7 @@ def measure_time(f):
     :return: the results of function f and total time of its execution
     """
 
+    # noinspection PyShadowingNames
     @wraps(f)
     def wrapper(*args, **kwargs):
         start = time()
