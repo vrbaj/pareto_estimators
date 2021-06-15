@@ -3,7 +3,6 @@ from scipy.stats import hmean
 from functools import wraps
 from timeit import default_timer as time
 import numpy as np
-from matplotlib import pyplot as plt
 import pickle
 
 
@@ -179,53 +178,11 @@ def mm4_estimator(data_series):
     return alpha, gamma
 
 
-def graph_plotter(results_dictionary, file_name):
-    """
-    function to create and save a graph and table for an article with average computational times for each method
-    that are  in results_dictionary
-    :param file_name: name of file with eps extension where the plot is saved (i.e. computational_times.eps)
-    :param results_dictionary: dictionary where the key is the method name and value is a list
-    [average computational time, std dev]
-    :return: None
-    """
-    computational_times = [value[0] for key, value in results_dictionary.items()]
-    plt.bar(results_dictionary.keys(), computational_times)
-    plt.xlabel("Estimation method")
-    plt.ylabel("Computational time [$s$]")
-    plt.tight_layout(True)
-    plt.savefig(file_name, format="eps", dpi=600)
-
-
-def table_maker(results_dictionary, file_name):
-    """
-    function to create tex table with average computational times for each method that is in results_dictionary
-    :param results_dictionary: dictionary where the key is the method name and value is a list
-    [average computational time, std dev]
-    :param file_name: name of plain text with with latex table
-    :return: None
-    """
-    with open(file_name, "w") as f:
-        f.writelines(r"\begin{table}[]" + "\n")
-        f.writelines(r"\centering" + "\n")
-        f.writelines(r"\begin{tabular}{|c|c|c|}" + "\n")
-        f.writelines(r"\hline" + "\n")
-        f.writelines(r"Method & $\overline{CT}$ & $\sigma_{CT}$" + "$CT_{max}$" + "\n")
-        f.writelines(r"\hline" + "\n")
-        for key in results_dictionary.keys():
-            f.writelines(key + (r" & {:.2e} &  {:.2e} & {:.2e}\\ \hline".format(results_dictionary[key][0],
-                                                                                 results_dictionary[key][1],
-                                                                                 results_dictionary[key][2])) + "\n")
-        f.writelines(r"\end{tabular}" + "\n")
-        f.writelines(r"\end{table}" + "\n")
-
-    f.close()
-
-
 results_dict = {}
 pareto_shape = 5
 pareto_location = 3
 experiments_number = 10000
-data_quantity = 10000
+data_quantity = 100
 function_names = ["umvue_estimator", "ml_estimator", "mom_estimator", "mm1_estimator", "mm2_estimator", "mm3_estimator",
                   "mm4_estimator"]
 
@@ -238,15 +195,13 @@ for experiment in range(experiments_number):
 
 avg_results = {}
 for k in results_dict.keys():
+    print(k)
     if "scipy" not in k:
         total_time = []
         for result in results_dict[k]:
             total_time.append(result[1])
         avg_results[k.replace("_estimator", "")] = [np.average(total_time), np.std(total_time), np.max(total_time)]
 
+print(avg_results)
 with open("experiment_{}.pickle".format(data_quantity), "wb") as handle:
     pickle.dump(avg_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-graph_plotter(avg_results, "ct_results_{}.eps".format(data_quantity))
-table_maker(avg_results, "ct_table_{}.txt".format(data_quantity))
-plt.show()
