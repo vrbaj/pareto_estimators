@@ -4,6 +4,7 @@ from functools import wraps
 from timeit import default_timer as time
 import numpy as np
 from matplotlib import pyplot as plt
+import pickle
 
 
 def measure_time(f):
@@ -211,8 +212,9 @@ def table_maker(results_dictionary, file_name):
         f.writelines(r"Method & $\overline{CT}$ & $\sigma_{CT}$" + "$CT_{max}$" + "\n")
         f.writelines(r"\hline" + "\n")
         for key in results_dictionary.keys():
-            f.writelines(key + (r" & {:.2e} &  {:.2e} \\ \hline".format(results_dictionary[key][0],
-                                                                        results_dictionary[key][1])) + "\n")
+            f.writelines(key + (r" & {:.2e} &  {:.2e} & {:.2e}\\ \hline".format(results_dictionary[key][0],
+                                                                                 results_dictionary[key][1],
+                                                                                 results_dictionary[key][2])) + "\n")
         f.writelines(r"\end{tabular}" + "\n")
         f.writelines(r"\end{table}" + "\n")
 
@@ -223,7 +225,7 @@ results_dict = {}
 pareto_shape = 5
 pareto_location = 3
 experiments_number = 10000
-data_quantity = 50
+data_quantity = 10000
 function_names = ["umvue_estimator", "ml_estimator", "mom_estimator", "mm1_estimator", "mm2_estimator", "mm3_estimator",
                   "mm4_estimator"]
 
@@ -241,6 +243,9 @@ for k in results_dict.keys():
         for result in results_dict[k]:
             total_time.append(result[1])
         avg_results[k.replace("_estimator", "")] = [np.average(total_time), np.std(total_time), np.max(total_time)]
+
+with open("experiment_{}.pickle".format(data_quantity), "wb") as handle:
+    pickle.dump(avg_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 graph_plotter(avg_results, "ct_results_{}.eps".format(data_quantity))
 table_maker(avg_results, "ct_table_{}.txt".format(data_quantity))
