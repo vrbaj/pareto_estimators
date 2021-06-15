@@ -182,7 +182,7 @@ results_dict = {}
 pareto_shape = 5
 pareto_location = 3
 experiments_number = 10000
-data_quantity = 100
+data_quantity = 1000
 function_names = ["umvue_estimator", "ml_estimator", "mom_estimator", "mm1_estimator", "mm2_estimator", "mm3_estimator",
                   "mm4_estimator"]
 

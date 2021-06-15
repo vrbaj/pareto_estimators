@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import pickle
+import collections
 
 
 def graph_plotter(results_dictionary, file_name):
@@ -35,15 +36,10 @@ def table(sample_sizes, file_name):
             results[str(size)] = pickle.load(handle)
         handle.close()
     result_by_method = dict.fromkeys(results[str(size)].keys(), [])
+
+    counter = 0
     print(results)
-    print(result_by_method)
-    for method in result_by_method.keys():
-        # print(result)
-        for result in results.keys():
-            print(results[result][method])
-            result_by_method[method].append(results[result][method])
-            print(result_by_method)
-    print(result_by_method)
+
     with open(file_name, "w") as f:
         f.writelines(r"\begin{table}[]" + "\n")
         f.writelines(r"\centering" + "\n")
@@ -55,12 +51,18 @@ def table(sample_sizes, file_name):
                      + r"\\ \cline{2 -" + str(len(sample_sizes) * 2 + 1) + "}" + "\n")
         s = "{}".format(" & ".join("$CT_{avg}$ & $CT_{max}$" for _ in range(len(sample_sizes))))
         f.writelines(r" & " + s + r"\\ \hline" + "\n")
-
-
+        for method in result_by_method:
+            s = method
+            for sample_number, dicts in results.items():
+                s = s + r" & ${:.2f}$ & ${:.2f}$ ".format(1000000 * dicts[method][0],
+                                                              1000000 * dicts[method][2]).replace("e-0", "\cdot 10^{-")
+                print(s)
+            s = s + r" \\ \hline" + "\n"
+            f.write(s)
         f.writelines(r"\end{tabular}" + "\n")
         f.writelines(r"\end{table}" + "\n")
     f.close()
-
+    print(result_by_method)
 
 def table_maker(results_dictionary, file_name):
     """
@@ -78,9 +80,9 @@ def table_maker(results_dictionary, file_name):
         f.writelines(r"Method & $\overline{CT}$ & $\sigma_{CT}$" + "$CT_{max}$" + "\n")
         f.writelines(r"\hline" + "\n")
         for key in results_dictionary.keys():
-            f.writelines(key + (r" & {:.2e} &  {:.2e} & {:.2e}\\ \hline".format(results_dictionary[key][0],
-                                                                                 results_dictionary[key][1],
-                                                                                 results_dictionary[key][2])) + "\n")
+            f.writelines(key + (r" & {:.2e} &  {:.2e} & {:.2e}\\ \hline".format(1000 * results_dictionary[key][0],
+                                                                                 1000 *results_dictionary[key][1],
+                                                                                 1000 * results_dictionary[key][2])) + "\n")
         f.writelines(r"\end{tabular}" + "\n")
         f.writelines(r"\end{table}" + "\n")
 
@@ -88,7 +90,7 @@ def table_maker(results_dictionary, file_name):
 
 
 sample_sizes = [50, 100, 500, 1000, 2000, 10000]
-sample_sizes = [50, 100]
+sample_sizes = [50, 100, 500, 1000, 5000]
 table(sample_sizes, "example.tex")
 
 
