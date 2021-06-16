@@ -5,7 +5,7 @@ import collections
 
 def graph_plotter(results_dictionary, file_name):
     """
-    function to create and save a graph and table for an article with average computational times for each method
+    function to create and save a graph for an article with average computational times for each method
     that are  in results_dictionary
     :param file_name: name of file with eps extension where the plot is saved (i.e. computational_times.eps)
     :param results_dictionary: dictionary where the key is the method name and value is a list
@@ -89,9 +89,35 @@ def table_maker(results_dictionary, file_name):
     f.close()
 
 
-sample_sizes = [50, 100, 500, 1000, 2000, 10000]
-sample_sizes = [5000]
-table(sample_sizes, "example.tex")
+def graph_plotter_ext(sample_sizes, file_name):
+    """
+    function to create graph with average computational times times for each method and
+    for various sample sizes. Data are loaded from pickle files that contains dictionary (key is the method name,
+    value is [average computational time, std dev, maximum computational time]
+    :param file_name: name of file where is the tex table saved
+    :param sample_sizes: number that specified pickled file with according sample size.. (i.e. 50 means that
+    "experiment_50.pickle" is going to be load
+    :return: None
+    """
+    results = {}
+    x_labels = []
+    for size in sample_sizes:
+        x_labels.append(int(size))
+        with open("experiment_{}.pickle".format(size), "rb") as handle:
+            results[str(size)] = pickle.load(handle)
+        handle.close()
+    result_by_method = dict.fromkeys(results[str(size)].keys(), [])
+    for method in result_by_method:
+        s = method
+        for sample_number, dicts in results.items():
+            s = s + r" & ${:.2f}$ & ${:.2f}$ ".format(1000000 * dicts[method][0],
+                                                      1000000 * dicts[method][2]).replace("e-0", "\cdot 10^{-")
+            print(s)
 
+
+
+sample_sizes = [50, 100, 500, 1000, 5000]
+# table(sample_sizes, "example.tex")
+graph_plotter_ext(sample_sizes, "graph.eps")
 
 
