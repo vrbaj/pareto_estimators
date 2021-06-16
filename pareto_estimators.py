@@ -18,6 +18,7 @@ def measure_time(f):
     def wrapper(*args, **kwargs):
         start = time()
         result = f(*args, **kwargs)
+        print(result)
         end = time()
         duration = end - start
         # print('Elapsed time: {} seconds'.format(duration) + ' for function ' + f.__name__)
@@ -181,8 +182,8 @@ def mm4_estimator(data_series):
 results_dict = {}
 pareto_shape = 5
 pareto_location = 3
-experiments_number = 10000
-data_quantity = 1000
+experiments_number = 100
+data_quantity = 111
 function_names = ["umvue_estimator", "ml_estimator", "mom_estimator", "mm1_estimator", "mm2_estimator", "mm3_estimator",
                   "mm4_estimator"]
 
@@ -190,18 +191,29 @@ for experiment in range(experiments_number):
     for function_name in function_names:
         pareto_data = get_pareto_data(pareto_shape, pareto_location, data_quantity)
         eval(function_name + "(pareto_data)")
+
     if experiment % 100 == 99:
         print("Evaluated {:.2%} experiments".format((experiment + 1) / experiments_number))
 
 avg_results = {}
+avg_errors = {}
 for k in results_dict.keys():
-    print(k)
+
     if "scipy" not in k:
         total_time = []
+        parameter_results = {"alpha": [], "gamma": []}
         for result in results_dict[k]:
             total_time.append(result[1])
+            parameter_results["alpha"].append(result[0][0])
+            parameter_results["gamma"].append(result[0][1])
         avg_results[k.replace("_estimator", "")] = [np.average(total_time), np.std(total_time), np.max(total_time)]
+        avg_errors[k.replace("_estimator", "")] = [
+            np.average((np.array(parameter_results["alpha"]) - pareto_shape) ** 2),
+            np.average((np.array(parameter_results["gamma"]) - pareto_location) ** 2)]
 
 print(avg_results)
+print(avg_errors)
 with open("experiment_{}.pickle".format(data_quantity), "wb") as handle:
     pickle.dump(avg_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+print(results_dict)
