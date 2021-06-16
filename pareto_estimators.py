@@ -18,7 +18,7 @@ def measure_time(f):
     def wrapper(*args, **kwargs):
         start = time()
         result = f(*args, **kwargs)
-        print(result)
+#        print(result)
         end = time()
         duration = end - start
         # print('Elapsed time: {} seconds'.format(duration) + ' for function ' + f.__name__)
@@ -180,10 +180,10 @@ def mm4_estimator(data_series):
 
 
 results_dict = {}
-pareto_shape = 5
-pareto_location = 3
-experiments_number = 100
-data_quantity = 111
+pareto_shape = 4
+pareto_location = 1
+experiments_number = 10000
+data_quantity = 5000
 function_names = ["umvue_estimator", "ml_estimator", "mom_estimator", "mm1_estimator", "mm2_estimator", "mm3_estimator",
                   "mm4_estimator"]
 
@@ -213,7 +213,10 @@ for k in results_dict.keys():
 
 print(avg_results)
 print(avg_errors)
-with open("experiment_{}.pickle".format(data_quantity), "wb") as handle:
+# with open("experiment_{}.pickle".format(data_quantity), "wb") as handle:
+#     pickle.dump(avg_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+with open("errors_params_{}_{}_samplesize_{}.pickle".format(pareto_shape, pareto_location, data_quantity), "wb") as handle:
     pickle.dump(avg_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-print(results_dict)
+# print(results_dict)
