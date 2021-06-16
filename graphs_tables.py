@@ -90,7 +90,7 @@ def table_maker(results_dictionary, file_name):
 
 
 sample_sizes = [50, 100, 500, 1000, 2000, 10000]
-sample_sizes = [50, 100, 500, 1000, 5000]
+sample_sizes = [5000]
 table(sample_sizes, "example.tex")
 
 
