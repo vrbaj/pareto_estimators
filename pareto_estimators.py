@@ -180,8 +180,8 @@ def mm4_estimator(data_series):
 
 
 results_dict = {}
-pareto_shape = 4
-pareto_location = 1
+pareto_shape = 5
+pareto_location = 3
 experiments_number = 10000
 data_quantity = 5000
 function_names = ["umvue_estimator", "ml_estimator", "mom_estimator", "mm1_estimator", "mm2_estimator", "mm3_estimator",
@@ -217,6 +217,6 @@ print(avg_errors)
 #     pickle.dump(avg_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 with open("errors_params_{}_{}_samplesize_{}.pickle".format(pareto_shape, pareto_location, data_quantity), "wb") as handle:
-    pickle.dump(avg_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    pickle.dump(avg_errors, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 # print(results_dict)
